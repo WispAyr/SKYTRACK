@@ -1,0 +1,79 @@
+media_server:
+  # Stream Management
+  max_concurrent_streams: 16
+  connection_timeout_ms: 5000
+  reconnect_attempts: 3
+  reconnect_backoff_ms: [1000, 2000, 5000]
+  
+  # Load Balancing
+  load_balancing:
+    strategy: "least_loaded"  # "round_robin", "least_loaded", "weighted"
+    health_check_interval_ms: 1000
+    health_threshold: 70  # Minimum health score for active processing
+    
+  # Network Configuration
+  network:
+    bind_address: "0.0.0.0"
+    rtp_port_range: [50000, 50100]
+    max_packet_size: 1500
+    jitter_buffer_ms: 100
+    enable_nagle: false
+    
+  # Performance Tuning
+  performance:
+    frame_pool_size: 1000
+    max_frame_age_ms: 5000
+    enable_gpu_memory_pool: true
+    gpu_memory_pool_size_mb: 2048
+
+# Stream Processing Configuration
+stream_processing:
+  # Frame Buffer Management
+  frame_buffer:
+    max_frames_per_stream: 300  # 10 seconds at 30fps
+    frame_timeout_ms: 5000
+    enable_frame_skipping: true
+    max_skip_frames: 3
+    
+  # Quality Adaptation
+  quality_adaptation:
+    enable_auto_bitrate: true
+    min_bitrate_kbps: 512
+    max_bitrate_kbps: 8192
+    adaptation_threshold: 0.8  # Trigger adaptation at 80% packet loss
+    
+  # Synchronization
+  synchronization:
+    max_timing_offset_ms: 16
+    sync_check_interval_ms: 100
+    enable_ptp: true
+    ptp_priority: 128
+
+# Stream Health Monitoring Configuration
+monitoring:
+  stream_health:
+    metrics:
+      - packet_loss_rate
+      - jitter_ms
+      - frame_drop_rate
+      - network_latency_ms
+      - stream_bitrate_kbps
+      - resolution_changes
+      - codec_switches
+      
+    thresholds:
+      packet_loss_rate: 0.05  # 5%
+      jitter_ms: 50
+      frame_drop_rate: 0.1    # 10%
+      network_latency_ms: 200
+      
+    alerting:
+      webhook_url: "https://webhook.site/your-endpoint"
+      email_notifications: false
+      slack_webhook: ""
+      
+  performance:
+    cpu_utilization_threshold: 0.8
+    gpu_utilization_threshold: 0.9
+    memory_utilization_threshold: 0.85
+    frame_processing_latency_ms: 100

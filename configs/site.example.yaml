@@ -1,0 +1,80 @@
+site:
+  name: "Demo Field"
+  origin_llh: [55.4645, -4.6155, 20.0]   # lat, lon, h_ellip (WGS84)
+  enu_rotation_deg: 0                     # optional manual twist
+
+cameras:
+  - id: cam01
+    rtsp: "rtsp://user:pass@10.0.0.11/stream1"
+    rtp_config:
+      protocol: "rtp_udp"  # "rtp_udp", "rtp_tcp", "rtsp", "webrtc"
+      port: 50001
+      ssrc: 12345
+      payload_type: 96  # H.264
+      bitrate_kbps: 2048
+      resolution: [1920, 1080]
+      fps: 30
+      priority: "high"  # "high", "medium", "low"
+    network_qos:
+      dscp: 46  # Expedited Forwarding
+      enable_rtcp: true
+      rtcp_interval_ms: 1000
+    approx_pose: {enu: [0,0,6], yaw: 90, pitch: -5, roll: 0}
+    intrinsics_guess: {fx: 1200, fy: 1200, cx: 960, cy: 540, k1: 0.0, k2: 0.0}
+    rolling_shutter: {line_us: 20, direction: "down"}
+    use_for_calib: true
+    
+  - id: cam02
+    rtsp: "rtsp://user:pass@10.0.0.12/stream1"
+    rtp_config:
+      protocol: "rtp_udp"
+      port: 50002
+      ssrc: 12346
+      payload_type: 96
+      bitrate_kbps: 4096
+      resolution: [3840, 2160]  # 4K
+      fps: 25
+      priority: "high"
+    network_qos:
+      dscp: 46
+      enable_rtcp: true
+      rtcp_interval_ms: 1000
+    approx_pose: {enu: [120,0,6], yaw: -90, pitch: -4, roll: 0}
+    use_for_calib: true
+
+processing:
+  fps_target: 15
+  window_seconds: 2.0
+  voxel:
+    extent_enu_m: [8000, 8000, 2000]
+    voxel_m: 10.0
+    s_min_m: 100
+    s_max_m: 5000
+    alpha_r0_m: 1000
+  thresholds:
+    motion_soft: 6.0        # after denoise, in gray levels
+    peak_sigma: 4.0
+    min_cameras: 3
+    min_frames: 4
+
+calibration:
+  mode: "online"            # "coldstart" | "online"
+  feature: {type: "ORB", n: 4000}
+  ba:
+    window_minutes: 5
+    robust_loss: "Huber"
+    reproj_px_max: 2.5
+  time_sync:
+    allow_offset_ms: true
+    max_search_ms: 50
+    beacon: {enabled: false}
+
+output:
+  api:
+    host: "0.0.0.0"
+    port: 8080
+  clips:
+    pre_s: 2.0
+    post_s: 3.0
+  ui:
+    enable: true
