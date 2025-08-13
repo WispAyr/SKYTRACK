@@ -1,0 +1,116 @@
+[tool.poetry]
+name = "drone-voxel-server"
+version = "0.2.0"
+description = "High-performance multi-camera drone detection and tracking system with 3D voxel projection and self-calibration"
+authors = ["Your Name <your.email@example.com>"]
+license = "Apache-2.0"
+readme = "README.md"
+packages = [
+    {include = "apps"},
+    {include = "core"},
+    {include = "tools"}
+]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+fastapi = "^0.104.0"
+uvicorn = {extras = ["standard"], version = "^0.24.0"}
+websockets = "^12.0"
+pydantic = "^2.5.0"
+pydantic-settings = "^2.1.0"
+opencv-python = "^4.8.1"
+numpy = "^1.24.0"
+scipy = "^1.11.0"
+scikit-learn = "^1.3.0"
+pyyaml = "^6.0.1"
+python-multipart = "^0.0.6"
+aiofiles = "^23.2.0"
+psutil = "^5.9.0"
+prometheus-client = "^0.19.0"
+structlog = "^23.2.0"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^7.4.0"
+pytest-asyncio = "^0.21.0"
+pytest-cov = "^4.1.0"
+black = "^23.11.0"
+isort = "^5.12.0"
+flake8 = "^6.1.0"
+mypy = "^1.7.0"
+pre-commit = "^3.5.0"
+
+[tool.poetry.group.media.dependencies]
+gstreamer-python = "^0.3.0"
+av = "^10.0.0"
+aiortc = "^1.5.0"
+
+[tool.poetry.group.gpu.dependencies]
+cupy-cuda11x = "^12.0.0"
+torch = "^2.1.0"
+torchvision = "^0.16.0"
+
+[tool.poetry.scripts]
+drone-voxel-server = "apps.api_server.main:main"
+drone-voxel-media = "apps.media_server.main:main"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.black]
+line-length = 88
+target-version = ['py39']
+include = '\.pyi?$'
+extend-exclude = '''
+/(
+  # directories
+  \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | build
+  | dist
+)/
+'''
+
+[tool.isort]
+profile = "black"
+multi_line_output = 3
+line_length = 88
+
+[tool.mypy]
+python_version = "3.9"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_untyped_decorators = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+warn_unreachable = true
+strict_equality = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py", "*_test.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = [
+    "--strict-markers",
+    "--strict-config",
+    "--cov=apps",
+    "--cov=core",
+    "--cov-report=term-missing",
+    "--cov-report=html",
+    "--cov-report=xml"
+]
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "integration: marks tests as integration tests",
+    "unit: marks tests as unit tests"
+]
